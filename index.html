@@ -418,7 +418,9 @@ select option { background: #fff; color: var(--text); }
             <select id="pipelineVal" required>
               <option value="">— Select Pipeline —</option>
               <option>Canada &amp; AUS</option><option>Canada</option><option>Australia</option>
-              <option>UK</option><option>Germany</option><option>USA NIW</option><option>Other</option>
+              <option>UK</option><option>Germany</option><option>USA NIW</option>
+              <option>Sales Visit</option><option>Work permit</option><option>Germany opportunity</option>
+              <option>Portugal D2/D8</option><option>Wrong pipeline</option><option>Other</option>
             </select>
           </div>
         </div>
@@ -589,7 +591,7 @@ select option { background: #fff; color: var(--text); }
 <div class="toast" id="toast"></div>
 
 <script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxevLLvpSL9IbXpy2786-gFz_7xcxutSlhu-NlIyawqOnqK5yDANI6xMNz33eg2YUlH/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwlx2V_cUIm9-ulo6Ausruv6x8XXTbLPGAaslWEv3IJEd6G1D1GcvhpQ5D3WJTWpAQB/exec";
 const TEAM = "DXB";
 
 const answers = { correctDealStage:null, correctPipeline:null, notesDescription:null,
@@ -733,10 +735,13 @@ async function submitAudit() {
     followupTask:effectiveAnswers.followupTask, dealLostReason:effectiveAnswers.dealLostReason,
     score: Object.keys(autofails).length > 0 ? 0 : total, comments:document.getElementById('comments').value, auditorName:a, team:TEAM };
   try {
-    await fetch(APPS_SCRIPT_URL,{method:'POST',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify(payload),
-      mode:'no-cors'});
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if(result.status !== 'success') throw new Error(result.message || 'Unknown error');
     showToast('✓ Audit submitted to Google Sheet!','success');
     setTimeout(()=>resetForm(),2000);
   } catch(e){ showToast('Submission failed: '+e.message,'error'); }
